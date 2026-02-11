@@ -1,57 +1,69 @@
-Hello CS 4341 A23!
+# Dots and Boxes (Python)
 
-Below is information about using the Referee we are providing for project 1.
-Description adapted from Will Babincsak README UTTT
-_________________________________________________________________________________
+A playable Dots and Boxes implementation with a simple referee that can run
+human or external players. The UI is built with `pygame`, and the game logic
+is in pure Python for easy modification and experimentation.
 
-# Dependencies and Python Version
+## Requirements
 
-This is the referee program for the Dots and Boxes AI for Project 1. 
-The details of how your programs need to communicate with the referee are on Canvas.
+- Python 3.9+
+- `numpy`
+- `pygame`
 
-The referee has two dependencies, `numpy` and `pygame`. Please install these with 
-`pip install numpy` and `python3 -m pip install -U pygame --user`. 
-If there are issues with installing, please refer to
-the official documentation for the libraries.
+Install dependencies:
 
-We can guarantee this program will work for Python 3.9 and up. 
-Please check that are you using a valid version of python.
-You can check your version with `python --version` and/or `python3 --version`.
-You may need to use `python` or `python3` or even `python3.9` 
-to properly run the program depending on how your system handled Python and if you are using an IDE.
-We will use `python` in the README for simplicity.
+```powershell
+python -m pip install numpy pygame
+```
 
-___________________________________________________________________
+## Run the Game (UI)
 
-# Running the Referee and Playing the Game
+Launch the interactive UI game:
 
-Once python and dependencies are sorted, you can run the referee with 
+```powershell
+python game.py <Player1Name> <Player2Name>
+```
 
-`python referee.py <Player 1 name> <Player 2 name> --time_limit <time limit>`
+This starts a game using the built-in player hooks. The UI opens in a
+`pygame` window.
 
-The Player 1 and 2 names are *single word names* for each of the agents.
-`--time_limit` is an optional argument that allows you to specify the time limit to play (in seconds).
-It defaults to 10 seconds. We will use 10 seconds in the competition. 
-This argument option is provide to allow easier debugging.
+## Run the Referee (External Players)
 
-The referee will create the files that it maintains in the same directory that the referee.py file is in.
+The referee drives a game between two external players that communicate via
+files. It creates and watches a `move_file` and uses `.go` / `.pass` files to
+signal turns.
 
-If you would like to just play the game, run
+```powershell
+python referee.py <Player1Name> <Player2Name> --time_limit 10
+```
 
-`python game.py <Player 1 name> <Player 2 name>`
+- `--time_limit` is optional and defaults to 10 seconds.
+- The referee creates/cleans its files in the same directory as `referee.py`.
 
-and then you can play using the UI.
+### External Player Protocol (Summary)
 
-You should not need to modify any of the code provided to you. 
-You are to write your owm program that can communicate with this referee.
+When it is a player's turn, the referee creates `<PlayerName>.go` (or
+`<PlayerName>.pass` for a forced pass). The player writes a move to
+`move_file` in the following format:
 
-_________________________________________________________________________
+```
+<PlayerName> r1,c1 r2,c2
+```
 
-# Bugs
+Coordinates are integers describing the selected edge. A pass is represented
+by `0,0 0,0` when a pass is required.
 
-If you for any reason suspect that the referee is not behaving as described in the assignment on Canvas, please let us know in the `project-1-referee-bugs` channel in Slack. 
-_________________________________________________________________________
+## Project Structure
 
-That is all! Have fun playing Dots and Boxes.
+- `game.py`: UI game loop and main entry point for interactive play.
+- `referee.py`: Headless referee that runs external players.
+- `core_gameplay.py`, `dotsandboxes.py`: Game rules and board logic.
+- `display.py`: Rendering and UI helpers.
+- `external_players.py`: File-based turn protocol for external bots.
 
--Adeline Evans and Fabrizio Filizzola
+## Notes
+
+If you are creating your own external player, keep it in a separate process
+and have it watch for its `.go` file, then write moves to `move_file`.
+
+Implemented for CS 4341 A23 in collaboration with 2 other students.
